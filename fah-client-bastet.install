@@ -1,0 +1,57 @@
+## arg 1:  the new package version
+pre_install() {
+  _name=fah-client
+  _client_home=/var/lib/$_name
+  
+  # Create group if it does not exist
+  if ! getent group $_name >/dev/null; then
+    echo "   ---> Adding $_name group"
+    groupadd --system $_name || true
+  fi
+
+  # Create user if it does not exist
+  if ! getent passwd $_name >/dev/null; then
+    echo "   ---> Adding $_name user"
+    useradd --system --gid $_name --shell /usr/sbin/nologin \
+      --home-dir $_client_home --no-create-home \
+      --groups video,render $_name || true
+  fi
+}
+
+## arg 1:  the new package version
+post_install() {
+  _name=fah-client
+  chown $_name:$_name /var/lib/$_name
+  chown $_name:$_name /var/log/$_name
+  chown $_name:$_name /etc/$_name
+  if [ ! -f /etc/$_name/config.xml ]; then
+    echo "   ---> Installing default config.xml to /etc/$_name"
+    echo "   ---> Edit file to add your credentials"
+    install -m 644 -o $_name -g $_name \
+      /usr/share/doc/$_name/config.xml -t /etc/$_name/
+  fi
+}
+
+## arg 1:  the new package version
+## arg 2:  the old package version
+#pre_upgrade() {
+	# do something here
+#}
+
+## arg 1:  the new package version
+## arg 2:  the old package version
+#post_upgrade() {
+	# do something here
+#}
+
+## arg 1:  the old package version
+#pre_remove() {
+	# do something here
+#}
+
+## arg 1:  the old package version
+#post_remove() {
+	# do something here
+#}
+
+# vim:set ts=2 sw=2 et:
